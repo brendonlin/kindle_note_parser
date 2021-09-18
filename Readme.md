@@ -26,13 +26,13 @@ Options:
 
 ## Example
 
-For English notes under "Documnets"
+For English notes under "Documents"
 
 ```
 kindle-p note.html -v
 ```
 
-For Chinese notes under "Documnets",
+For Chinese notes under "Documents",
 
 ```
 kindle-p note.html -vr
