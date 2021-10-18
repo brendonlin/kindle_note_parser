@@ -4,12 +4,19 @@ Convert kindle html note to markdown format
 """
 import bs4
 import os
+import re
 import urllib.parse
 
 
 def format_text(text, is_remove_space=False):
+    new_words = []
+    EMPTY_WORD = " "
     if is_remove_space:
-        return text.replace(" ", "")
+        for word in re.split(r"\s+", text):
+            new_words.append(word)
+            if re.match("^[a-zA-Z]+$", word):
+                new_words.append(EMPTY_WORD)
+        return "".join(new_words)
     else:
         return text
 

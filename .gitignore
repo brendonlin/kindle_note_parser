@@ -2,3 +2,7 @@
 .pytest_cache
 env
 __pycache__
+build
+dist
+kindle_note_parser.egg-info
+doc
