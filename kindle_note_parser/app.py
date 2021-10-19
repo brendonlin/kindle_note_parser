@@ -29,11 +29,17 @@ from . import parser
 )
 def main(file_name, source_dir, output_dir, remove_space: bool, view_result: bool):
     if source_dir is None:
-        _source_dir = os.path.join(os.path.expanduser("~"), "Documents")
+        os.path.join(os.path.expanduser("~"), "Documents")
+    else:
+        _source_dir = source_dir
     if output_dir is None:
         _output_dir = os.path.join(os.path.expanduser("~"), "Documents")
+    else:
+        _output_dir = output_dir
     source_file_path = os.path.join(_source_dir, file_name)
-    save_fp = parser.parse(source_file_path, _output_dir, remove_space=remove_space)
+    save_fp = parser.html_to_doc(
+        source_file_path, _output_dir, remove_space=remove_space
+    )
     if view_result:
         os.startfile(save_fp)
 
