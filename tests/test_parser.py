@@ -7,4 +7,4 @@ from kindle_note_parser import parser
     [("你 看， 这是 我 买的 小说 《 War and Peace》", "你看，这是我买的小说《War and Peace》")],
 )
 def test_format_text(input, expected):
-    assert parser.format_text(input, is_remove_space=True) == expected
+    assert parser._format_text(input, remove_space=True) == expected
