@@ -4,6 +4,11 @@ A tool for converting Kindle HTML notes to Markdown format.
 
 一个用于将 Kindle 的 HTML 笔记转换为 Markdown 格式的工具。
 
+## Features
+
+- Support notebook file from kindle for PC or kindle for Mobile both.
+- Support remove space between words if you need.
+
 ## Usage
 
 ```
@@ -25,14 +30,14 @@ Options:
 
 ## Example
 
-For English notes under "Documents"
+For notes under "Documents"
 
 ```
 kindle-p note.html -v
 ```
 
-For Chinese notes under "Documents",
+You can remove space between words
 
 ```
-kindle-p note.html -vr
+kindle-p note.html -r
 ```

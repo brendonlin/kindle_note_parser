@@ -1,5 +1,8 @@
 import pytest
 from kindle_note_parser import parser
+import bs4
+from bs4.element import NavigableString
+import re
 
 
 @pytest.mark.parametrize(
@@ -10,9 +13,11 @@ def test_format_text(input, expected):
     assert parser.format_text(input, remove_space=True) == expected
 
 
-def test_html_to_doc():
-    test_html_path = "tests/data/kindel_html_sample_cn.html"
-    title = "kindel_html_sample_cn"
-    doc = parser.html_to_doc(html_path=test_html_path, title=title)
-    assert doc.startswith(f"# {title}")
+def test_new_parser():
+    test_html_path = "tests/data/kindel_html_sample_cn_mobile.html"
+    # test_html_path = "tests/data/kindel_html_sample_cn.html"
+    soup = parser._read(test_html_path)
+    doc = parser._transform(soup=soup)
+    print(doc)
+    assert doc.startswith(f"# ")
     assert doc.count("##") > 1

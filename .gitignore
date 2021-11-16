@@ -8,3 +8,5 @@ kindle_note_parser.egg-info
 doc
 .mpypy_cache
 *.log
+data
+note

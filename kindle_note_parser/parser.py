@@ -6,73 +6,67 @@ import os
 import re
 import urllib.parse
 import bs4
+from bs4.element import NavigableString
 
 
 def parse(html_path, output_dir, remove_space=False):
-    input_path = format_html_path(html_path)
+    input_path = _format_html_path(html_path)
     title = os.path.basename(input_path).split(".")[0]
-    doc = html_to_doc(html_path, title, remove_space)
-    output_path = output(doc, title, output_dir)
+    soup = _read(html_path)
+    doc = _transform(soup, remove_space)
+    output_path = _output(doc, title, output_dir)
     return output_path
 
 
-def html_to_doc(html_path, title, remove_space=False):
-    html = read_html(html_path)
+def _read(html_path):
+    with open(html_path, "r", encoding="utf-8") as f:
+        html = f.read()
     soup = bs4.BeautifulSoup(html, features="html.parser")
-    output_texts = [
-        get_output_text(x, remove_space)
-        for x in soup.findAll("div", attrs={"class": "noteText"})
-    ]
-    header = f"# {title}"
-    output_texts.insert(0, header)
-    output_doc = "\n\n".join(output_texts)
-    return output_doc
+    return soup
 
 
-def output(doc, title, output_dir):
+def _output(doc, title, output_dir):
     output_path = os.path.join(output_dir, f"{title}.txt")
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(doc)
     return output_path
 
 
+def _transform(soup, remove_space=False):
+    pattern = re.compile("(noteText)|(noteHeading)|(sectionHeading)|(bookTitle)")
+    parts = soup.find_all(class_=pattern)
+    text_list = []
+
+    for part in parts:
+        text = "".join([x for x in part.children if isinstance(x, NavigableString)])
+        text = format_text(text, remove_space=remove_space)
+        classes = part.attrs.get("class")
+        if "noteHeading" in classes:
+            text = f"**{text}**"
+        elif "sectionHeading" in classes:
+            text = f"## {text}"
+        elif "bookTitle" in classes:
+            text = f"# {text}"
+        text_list.append(text)
+    doc = "\n\n".join(text_list)
+    return doc
+
+
 def format_text(text, remove_space=False):
-    new_words = []
-    EMPTY_WORD = " "
+    _text = re.sub(r"(^\n)|(\n$)", "", text)
     if remove_space:
-        for word in re.split(r"\s+", text):
+        new_words = []
+        EMPTY_WORD = " "
+        for word in re.split(r"\s+", _text):
             new_words.append(word)
             if re.match("^[a-zA-Z]+$", word):
                 new_words.append(EMPTY_WORD)
         return "".join(new_words)
     else:
-        return text
+        return _text
 
 
-def get_output_text(textSoup: bs4.BeautifulSoup, remove_space=False):
-    section_head = textSoup.find("h2", attrs={"class": "sectionHeading"})
-    section_head_text = ""
-    if section_head is not None:
-        section_head_text = f"## {format_text(section_head.text, remove_space)}"
-        section_head.replace_with("")
-    note_head = textSoup.find("h3", attrs={"class": "noteHeading"})
-    note_head_text = ""
-    if note_head is not None:
-        note_head_text = f"**{format_text(note_head.text, remove_space)}**"
-        note_head.replace_with("")
-    content_text = format_text(textSoup.text, remove_space)
-    return "\n\n".join(
-        [x for x in [content_text, section_head_text, note_head_text] if x != ""]
-    )
-
-
-def format_html_path(path):
+def _format_html_path(path):
     loc = "file:///"
     fp = urllib.parse.unquote(path.replace(loc, ""))
     return fp
-
-
-def read_html(path):
-    with open(path, "r", encoding="utf-8") as f:
-        html = f.read()
-    return html
